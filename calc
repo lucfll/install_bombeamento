@@ -1,0 +1,39 @@
+sudo apt update && sudo apt upgrade -y
+
+#  Instalar dependências do sistema
+sudo apt install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    build-essential \
+    libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libblas-dev \
+    liblapack-dev \
+    libevent-dev \
+    git \
+    nginx  
+
+git clone https://github.com/lucfll/sistemadebombeamento.git
+
+#  Configurar ambiente virtual
+python3 -m venv venv
+source venv/bin/activate
+
+#  Instalar dependências Python
+pip install --upgrade pip
+pip install wheel setuptools  # Dependências essenciais
+pip install \
+    flask \
+    numpy \
+    scipy \
+    matplotlib \
+    fluids \
+    reportlab \
+    gunicorn \
+    gevent
+
+#  Verificar instalação
+pip list | grep -E 'flask|numpy|scipy|matplotlib|fluids|reportlab|gunicorn|gevent'
