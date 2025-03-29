@@ -37,3 +37,6 @@ pip install \
 
 #  Verificar instalação
 pip list | grep -E 'flask|numpy|scipy|matplotlib|fluids|reportlab|gunicorn|gevent'
+
+
+https://chatgpt.com/c/67e74665-72d8-8003-a16b-98328d34fe61
