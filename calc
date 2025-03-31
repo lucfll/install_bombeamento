@@ -39,6 +39,121 @@ pip install \
 pip list | grep -E 'flask|numpy|scipy|matplotlib|fluids|reportlab|gunicorn|gevent'
 
 
+# executa para testar:
+
+gunicorn --bind 0.0.0.0:5000 app:app
+
+# Colocar o gunicorn como serviço
+
+sudo nano /etc/systemd/system/sistemadebombeamento.service
+
+[Unit]
+Description=Gunicorn instance for Sistema de Bombeamento
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/sistemadebombeamento
+ExecStart=/root/sistemadebombeamento/venv/bin/gunicorn --bind 0.0.0.0:5000 --log-level=debug app:app
+
+[Install]
+WantedBy=multi-user.target
+
+# Recarregue o systemd para reconhecer a mudança:
+sudo systemctl daemon-reload
+
+# Habilitar o serviço para iniciar automaticamente:
+
+sudo systemctl enable sistemadebombeamento.service
+
+#Verificar se está habilitado corretamente:
+
+systemctl is-enabled sistemadebombeamento.service
+
+# Reinicie o serviço para aplicar as alterações:
+
+sudo systemctl restart sistemadebombeamento
+sudo systemctl status sistemadebombeamento
+
+##################Instale o Nginx:######################
+
+
+
+sudo apt install nginx -y
+#Habilite o serviço para iniciar automaticamente:
+
+sudo systemctl enable nginx
+#Inicie o serviço
+
+sudo systemctl start nginx
+
+#Verifique se o Nginx está rodando corretamente:
+
+sudo systemctl status nginx
+
+
+
+
+#####################Passo 4: Criar um Virtual Host###############################
+# Crie um novo arquivo de configuração para seu domínio:
+
+sudo nano /etc/nginx/sites-available/system.solaropensource.com.br
+
+server {
+    listen 443 ssl;
+    server_name system.solaropensource.com.br;
+
+    ssl_certificate /etc/letsencrypt/live/system.solaropensource.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/system.solaropensource.com.br/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+####################Crie um link simbólico para ativar o Virtual Host:############################
+
+sudo ln -s /etc/nginx/sites-available/system.solaropensource.com.br /etc/nginx/sites-enabled/
+
+sudo systemctl restart nginx
+sudo nginx -t
+
+
+#####################Passo 3: Certbot###############################
+
+#Passo 1: Verificar se o Certbot está Instalado
+#Execute este comando para instalar ou atualizar o Certbot:
+
+sudo apt update && sudo apt install certbot python3-certbot-nginx -y
+
+sudo certbot certonly --nginx -d system.solaropensource.com.br
+
+# Após a conclusão, verifique se os arquivos foram criados:
+
+ls -l /etc/letsencrypt/live/system.solaropensource.com.br/
+
+ Passo 3: Corrigir Permissões
+## Às vezes, o Nginx pode não ter permissão para acessar os arquivos. Corrija com:
+
+sudo chown -R root:root /etc/letsencrypt
+sudo chmod -R 755 /etc/letsencrypt
+
+
+###########################Atenção Após gerar o certificado desmarcar###############################
+# ssl_certificate /etc/letsencrypt/live/system.solaropensource.com.br/fullchain.pem;
+# ssl_certificate_key /etc/letsencrypt/live/system.solaropensource.com.br/privkey.pem;
+
+
+
+
+
+
+
 https://chatgpt.com/c/67e74665-72d8-8003-a16b-98328d34fe61
 
 
